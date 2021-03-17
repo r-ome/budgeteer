@@ -1,4 +1,4 @@
-import User from '../models/User';
+import { User } from '../models';
 
 export const getAll = async (): Promise<[]> => {
   try {
@@ -8,21 +8,21 @@ export const getAll = async (): Promise<[]> => {
   }
 };
 
-export const create = async (username: string): Promise<boolean> => {
-  try {
-    const user = new User({ user_id: null, username });
-    return user.create();
-  } catch (e) {
-    console.error({ controller: e });
-  }
-};
-
 export const get = async (userId: number): Promise<unknown> => {
   try {
     return await User.find(userId);
   } catch (e) {
     console.error({ controller: e });
     throw e;
+  }
+};
+
+export const create = async (username: string): Promise<boolean> => {
+  try {
+    const user = new User({ user_id: null, username });
+    return user.create();
+  } catch (e) {
+    console.error({ controller: e });
   }
 };
 
