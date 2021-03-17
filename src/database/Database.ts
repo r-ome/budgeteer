@@ -10,15 +10,54 @@ const config = {
   multipleStatements: true
 };
 
-
 class Database {
-  table: string;
-  primaryKey: string;
-
-  constructor(table: string, primaryKey: string) {
-    this.table = table;
-    this.primaryKey = primaryKey; 
+  static getConnection() {
+    return mysql.createConnection(config);
   }
+  // static connectionQuery = async (query, values = null, callback = null) => {
+  //   const connection = mysql.createConnection(config);
+  //   return new Promise((resolve, reject) => {
+  //     connection
+  //       .query(query, values, (err, rows) => {
+  //         if (err) {
+  //           reject(err);
+  //           return;
+  //         }
+  //         resolve(rows);
+  //       });
+  //   });
+  // }
+  // static beginTransaction(query, values = null, callback) {
+  //   const connection = mysql.createConnection(config);
+  //   connection.beginTransaction(function(err) {
+  //     if (err) { throw err; }
+  //     connection.query('query', values, function (error, results, fields) {
+  //       if (error) {
+  //         return connection.rollback(function() {
+  //           throw error;
+  //         });
+  //       }
+    
+  //       var log = 'Post ' + results.insertId + ' added';
+    
+  //       connection.query('INSERT INTO log SET data=?', log, function (error, results, fields) {
+  //         if (error) {
+  //           return connection.rollback(function() {
+  //             throw error;
+  //           });
+  //         }
+  //         connection.commit(function(err) {
+  //           if (err) {
+  //             return connection.rollback(function() {
+  //               throw err;
+  //             });
+  //           }
+  //           console.log('success!');
+  //         });
+  //       });
+  //     });
+  //   });
+  // }
 
   static poolQuery(query: string, values = null): Promise<any> {
     return new Promise((resolve, reject) => {

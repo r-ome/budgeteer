@@ -1,3 +1,5 @@
+DROP DATABASE budgeteer;
+
 CREATE DATABASE IF NOT EXISTS budgeteer;
 
 USE budgeteer;
@@ -12,13 +14,13 @@ CREATE TABLE IF NOT EXISTS accounts (
     user_id int(11) NOT NULL,
     name varchar(255) NOT NULL,
     account_number varchar(255),
-    type_id int(11) NOT NULL,
-    balance decimal(11, 2) 
+    balance decimal(11, 2)
 );
-CREATE TABLE IF NOT EXISTS account_types (
-    type_id int(11) PRIMARY KEY NOT NULL AUTO_INCREMENT,
+CREATE TABLE IF NOT EXISTS account_partitions (
+    account_partition_id int(11) PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    account_id int(11) NOT NULL,
     name varchar(255) NOT NULL,
-    percentage decimal(11,2) NOT NULL
+    percentage decimal(11, 2) NOT NULL
 );
 CREATE TABLE IF NOT EXISTS transactions (
     transaction_id int(11) PRIMARY KEY NOT NULL AUTO_INCREMENT,
