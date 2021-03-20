@@ -35,4 +35,33 @@ export default class User extends Model {
       );
       return new User(rows[0]);
     }
+
+    async getAccounts(userId: number): Promise<[]> {
+      try {
+        return Database.poolQuery(
+          'SELECT * FROM accounts WHERE user_id = ?',
+          userId
+        );
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    static async getPartitions(userId: number): Promise<[]> {
+      try {
+        return Database.poolQuery(
+          `
+            SELECT
+              ap.*
+            FROM account_partitions ap
+            INNER JOIN accounts a ON a.account_id = ap.account_id
+            WHERE a.user_id = ?
+          `,
+          userId
+        );
+
+      } catch (e) {
+        console.error(e);
+      }
+    }
 }

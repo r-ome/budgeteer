@@ -1,5 +1,6 @@
 import Model from './model';
 import Database from '../database/Database';
+import { User, AccountPartition } from '.';
 
 interface Attributes {
   account_id: number;
@@ -38,7 +39,7 @@ export default class Account extends Model {
       );
       return new Account(rows[0]);
     }
-    
+
     async create(): Promise<boolean> {
       try {
         const connection = await Database.getConnection();
@@ -47,32 +48,44 @@ export default class Account extends Model {
           connection.query(
             `INSERT INTO ${this.table} VALUES (?)`,
             [Object.values(this.attributes)],
-            (err, result) => {
+            async (err, result) => {
               if (err) {
                 console.log({ err });
                 return connection.rollback(() => { throw err; });
               }
-              connection.query(
-                'INSERT INTO account_partitions (account_id, name, percentage) VALUES (?)',
-                [
-                  [result.insertId, 'necessitities', 50.0],
-                  [result.insertId, 'play', 10.0]
-                ],
-                (err) => {
-                  if (err) {
-                    console.error(err);
-                  }
 
-                  connection.commit(err => {
-                    if (err) {
-                      return connection.rollback(() => {
-                        throw err;
-                      });
-                    }
-                    console.log('success!');
+              const userPartitions = await User.getPartitions(this.attributes.user_id);
+              if (userPartitions.length === 0) {
+                const something = [
+                  { name: 'necessities', percentage: 50.0 },
+                  { name: 'play', percentage: 10.0 },
+                  { name: 'education', percentage: 10.0 },
+                  { name: 'investments', percentage: 15.0 },
+                  { name: 'long term investments', percentage: 20.0 },
+                  { name: 'give', percentage: 5.0 },
+                ];
+                // create 6 default partitions
+                // then connect it to the first created account
+                // to do
+                // [ ] create insert bulk func
+              }
+
+              const userPartition = new AccountPartition({
+                account_id: result.insertId,
+                name: '',
+                percentage: 50.
+              });
+
+              await userPartition.create();
+              
+              connection.commit(err => {
+                if (err) {
+                  return connection.rollback(() => {
+                    throw err;
                   });
                 }
-              );
+                console.log('success!');
+              });
             });
         });
         return true;
@@ -80,6 +93,17 @@ export default class Account extends Model {
         console.error({ create_error : e });
         return e;
       }
+    }
+
+    async createPartition(): Promise<any> {
+      const partition = new AccountPartition({ 
+        account_partition_id: null,
+        account_id: this.attributes.account_id,
+        name: 'necessities12312312',
+        percentage: 50.0
+      });
+      console.log('hello world');
+      await partition.create();
     }
 
     async getPartitions(): Promise<[]> {
