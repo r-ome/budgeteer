@@ -27,14 +27,27 @@ class Model extends Database{
 
   async save(): Promise<boolean> {
     try {
-      const { user_id: userId, ...rest } = this.attributes;
+      const { [this.primaryKey]: id, ...rest } = this.attributes;
       await Database.poolQuery(
         `UPDATE ${this.table} SET ? WHERE ${this.primaryKey} = ?`,
-        [rest, userId]
+        [rest, id]
       );
       return true;
     } catch (e) {
       console.error(e);
+    }
+  }
+
+  async delete(): Promise<boolean> {
+    try {
+      await Database.poolQuery(
+        `DELETE FROM ${this.table} WHERE ${this.primaryKey} = ?`,
+        this.attributes[this.primaryKey]
+      );
+      return true;
+    } catch (e) {
+      console.error(e);
+      return false;
     }
   }
 }
