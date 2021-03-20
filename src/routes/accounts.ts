@@ -1,10 +1,11 @@
 import express from 'express';
 import {
-  create,
+  createAccount,
+  updateAccount,
   getAll,
   getPartitions
 } from '../controllers/AccountController';
-import { AccountPartition } from '../models';
+import { Account, AccountPartition } from '../models';
 
 const router = express.Router();
 // get all accounts
@@ -44,7 +45,7 @@ router.post('/:account_id/partitions', async (req, res) => {
 // get all accounts by user_id
 router.post('/:user_id', async (req, res)=> {
   try {
-    create(parseInt(req.params.user_id), {
+    await createAccount(parseInt(req.params.user_id), {
       name: req.body.name,
       account_number: req.body.account_number,
       balance: parseFloat(req.body.balance),
@@ -57,18 +58,23 @@ router.post('/:user_id', async (req, res)=> {
   }
 });
 
-// router.put('/:id', async (req, res) => {
-//   try {
-//     await update(parseInt(req.params.id), req.body.username);
-//     res.send('update user here');
-//   } catch (e) {
-//     console.error(e);
-//   }
-// });
+router.put('/:id', async (req, res) => {
+  try {
+    const result = await updateAccount(parseInt(req.params.id), { name: req.body.name });
+    res.send({ result });
+  } catch (e) {
+    console.error(e);
+  }
+});
 
-// not yet implemented
-// router.delete('/post', function (req, res) {
-//     res.send('create user here');
-// });
+router.delete('/:id', async (req, res) => {
+  try {
+    const account = await Account.find(parseInt(req.params.id));
+    const result = await account.delete();
+    res.send({ result });
+  } catch (e) {
+    console.error(e);
+  }
+});
 
 export default router;

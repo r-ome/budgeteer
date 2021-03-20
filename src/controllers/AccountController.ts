@@ -8,7 +8,7 @@ export const getAll = async (): Promise<[]> => {
   }
 };
 
-export const create = async (userId: number, body): Promise<boolean> => {
+export const createAccount = async (userId: number, body): Promise<boolean> => {
   try {
     const attributes = {
       account_id: null,
@@ -19,6 +19,26 @@ export const create = async (userId: number, body): Promise<boolean> => {
     };
     const account = new Account(attributes);
     return await account.create();
+  } catch (e) {
+    console.error(e);
+  }
+};
+
+export const updateAccount = async (accountId: number, body): Promise<any> => {
+  try {
+    const account = await Account.find(accountId);
+    account.attributes.name = body.name;
+    await account.save();
+    return account.attributes;
+  } catch (e) {
+    console.error(e);
+  }
+};
+
+export const deleteAccount = async (accountId: number): Promise<any> => {
+  try {
+    const account = await Account.find(accountId);
+    return await account.delete();
   } catch (e) {
     console.error(e);
   }

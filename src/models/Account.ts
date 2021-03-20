@@ -42,52 +42,10 @@ export default class Account extends Model {
 
     async create(): Promise<boolean> {
       try {
-        const connection = await Database.getConnection();
-        connection.beginTransaction((err) => {
-          if (err) { throw err; }
-          connection.query(
-            `INSERT INTO ${this.table} VALUES (?)`,
-            [Object.values(this.attributes)],
-            async (err, result) => {
-              if (err) {
-                console.log({ err });
-                return connection.rollback(() => { throw err; });
-              }
-
-              const userPartitions = await User.getPartitions(this.attributes.user_id);
-              if (userPartitions.length === 0) {
-                const something = [
-                  { name: 'necessities', percentage: 50.0 },
-                  { name: 'play', percentage: 10.0 },
-                  { name: 'education', percentage: 10.0 },
-                  { name: 'investments', percentage: 15.0 },
-                  { name: 'long term investments', percentage: 20.0 },
-                  { name: 'give', percentage: 5.0 },
-                ];
-                // create 6 default partitions
-                // then connect it to the first created account
-                // to do
-                // [ ] create insert bulk func
-              }
-
-              const userPartition = new AccountPartition({
-                account_id: result.insertId,
-                name: '',
-                percentage: 50.
-              });
-
-              await userPartition.create();
-              
-              connection.commit(err => {
-                if (err) {
-                  return connection.rollback(() => {
-                    throw err;
-                  });
-                }
-                console.log('success!');
-              });
-            });
-        });
+        await Database.poolQuery(
+          `INSERT INTO ${this.table} VALUES (?)`,
+          [Object.values(this.attributes)]
+        );
         return true;
       } catch (e) {
         console.error({ create_error : e });
